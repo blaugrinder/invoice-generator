@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { formatInvoiceNumber } from "@/lib/formatInvoiceNumber";
+import { amountToWords } from "@/lib/amountToWords";
 
 /**
  * POST /api/invoice
@@ -72,6 +73,7 @@ export async function POST(req: Request) {
 
     const totalTVA = totalHT * 0.2;
     const totalTTC = totalHT + totalTVA;
+    const totalInWords = amountToWords(totalTTC);
 
     // 5. Sauvegarder facture
     const invoice = await prisma.invoice.create({
@@ -105,6 +107,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       ...invoice,
       formattedNumber,
+      totalInWords,
     });
 
   } catch (error) {
